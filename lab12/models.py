@@ -122,8 +122,12 @@ def l2_at(pred, Y, secs):
 
 def l2_summary(pred, Y, brake):
     """Average of L2@1s, @2s, @3s: over all windows and over the 'lead is about to brake' slice."""
-    # TODO (Bước 3): hãy tự cài hàm này. Gợi ý:
-    #   Gọi l2_at(pred, Y, s) cho s = 1, 2, 3 và lấy trung bình ba giá trị cho mỗi cửa sổ. Trả dict: all
-    #   (trung bình mọi cửa sổ), brake_slice (trung bình trên cửa sổ có brake = True, nan nếu rỗng),
-    #   slice_share (tỷ lệ cửa sổ có brake = True).
-    raise NotImplementedError("TODO l2_summary: xem GUIDE.md, Bước 3")
+    err = (l2_at(pred, Y, 1.0) + l2_at(pred, Y, 2.0) + l2_at(pred, Y, 3.0)) / 3.0
+    brake = np.asarray(brake, bool)
+    slice_share = float(np.mean(brake)) if len(brake) > 0 else 0.0
+    brake_slice = float(np.mean(err[brake])) if np.any(brake) else float("nan")
+    return {
+        "all": float(np.mean(err)),
+        "brake_slice": brake_slice,
+        "slice_share": slice_share,
+    }
